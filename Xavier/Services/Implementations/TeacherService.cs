@@ -3,54 +3,46 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Utconnect.Coffer.Models;
 using Utconnect.Common.Models;
 using Utconnect.Common.Models.Errors;
+using Utconnect.Teacher.Models;
 using Utconnect.Teacher.Services.Abstract;
 
-namespace Utconnect.Coffer.Services.Implementations
+namespace Utconnect.Teacher.Services.Implementations
 {
-    public class TeacherService
-        : ITeacherService
+    public class TeacherService : ITeacherService
     {
         private readonly IHttpClientFactory _clientFactory;
-        private readonly IOptions<CofferConfig> _config;
+        private readonly IOptions<TeacherConfig> _config;
 
-        public TeacherService(IHttpClientFactory clientFactory, IOptions<CofferConfig> config)
+        public TeacherService(IHttpClientFactory clientFactory, IOptions<TeacherConfig> config)
         {
             _clientFactory = clientFactory;
             _config = config;
         }
 
-        public async Task<Result<string>> GetKey(string app, string secretName)
+        public async Task<Result<TeacherResponse>> GetById(Guid id)
         {
-            string cofferUrl = _config.Value.Url;
+            string teacherUrl = _config.Value.Url;
 
-            if (string.IsNullOrEmpty(cofferUrl))
+            if (string.IsNullOrEmpty(teacherUrl))
             {
-                return Result<string>.Failure(new InternalServerError("Coffer URL is empty"));
+                return Result<TeacherResponse>.Failure(new InternalServerError("Teacher URL is empty"));
             }
 
-            var requestUrl = $"{cofferUrl}/secret/be/{app}/{secretName}";
+            var requestUrl = $"{teacherUrl}/teacher/{id}";
             HttpClient client = _clientFactory.CreateClient();
             HttpResponseMessage response = await client.GetAsync(requestUrl);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return Result<string>.Failure(new InternalServerError("Response status is not success"));
-            }
 
             try
             {
                 string content = await response.Content.ReadAsStringAsync();
-                CofferResponse? jwtKey = JsonConvert.DeserializeObject<CofferResponse>(content);
-                return jwtKey != null
-                    ? Result<string>.Succeed(jwtKey.Data)
-                    : Result<string>.Failure(new InternalServerError("Retrieved data is null"));
+                Result<TeacherResponse>? data = JsonConvert.DeserializeObject<Result<TeacherResponse>>(content);
+                return data ?? Result<TeacherResponse>.Failure(new InternalServerError("Retrieved data is null"));
             }
             catch (Exception)
             {
-                return Result<string>.Failure(new InternalServerError("Cannot decode response"));
+                return Result<TeacherResponse>.Failure(new InternalServerError("Cannot decode response"));
             }
         }
     }

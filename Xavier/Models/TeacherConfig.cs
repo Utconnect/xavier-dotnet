@@ -2,7 +2,7 @@
 
 namespace Utconnect.Teacher.Models
 {
-    public class CofferConfig : ISiteConfig
+    public class TeacherConfig : ISiteConfig
     {
         public string Url { get; set; } = default!;
     }

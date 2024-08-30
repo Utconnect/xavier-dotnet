@@ -1,7 +1,13 @@
-﻿namespace Utconnect.Teacher.Models
+﻿using System;
+using Utconnect.Common.Models;
+
+namespace Utconnect.Teacher.Models
 {
-    public class CofferResponse
+    public class TeacherResponse
     {
-        public string Data { get; set; } = default!;
+        public Guid Id { get; set; }
+        public string Code { get; set; } = null!;
+        public IdNameModel Department { get; set; } = null!;
+        public IdNameModel Faculty { get; set; } = null!;
     }
 }
