@@ -21,7 +21,7 @@ namespace Utconnect.Teacher.Services.Implementations
             _config = config;
         }
 
-        public async Task<Result<TeacherResponse>> GetById(Guid id)
+        public async Task<Result<TeacherResponse>> GetById(Guid userId)
         {
             string teacherUrl = _config.Value.Url;
 
@@ -30,7 +30,32 @@ namespace Utconnect.Teacher.Services.Implementations
                 return Result<TeacherResponse>.Failure(new InternalServerError("Teacher URL is empty"));
             }
 
-            var requestUrl = $"{teacherUrl}/teacher/{id}";
+            var requestUrl = $"{teacherUrl}/teacher/{userId}";
+            HttpClient client = _clientFactory.CreateClient();
+            HttpResponseMessage response = await client.GetAsync(requestUrl);
+
+            try
+            {
+                string content = await response.Content.ReadAsStringAsync();
+                Result<TeacherResponse>? data = JsonConvert.DeserializeObject<Result<TeacherResponse>>(content);
+                return data ?? Result<TeacherResponse>.Failure(new InternalServerError("Retrieved data is null"));
+            }
+            catch (Exception)
+            {
+                return Result<TeacherResponse>.Failure(new InternalServerError("Cannot decode response"));
+            }
+        }
+
+        public async Task<Result<TeacherResponse>> GetByUserId(Guid userId)
+        {
+            string teacherUrl = _config.Value.Url;
+
+            if (string.IsNullOrEmpty(teacherUrl))
+            {
+                return Result<TeacherResponse>.Failure(new InternalServerError("Teacher URL is empty"));
+            }
+
+            var requestUrl = $"{teacherUrl}/teacher/user/{userId}";
             HttpClient client = _clientFactory.CreateClient();
             HttpResponseMessage response = await client.GetAsync(requestUrl);
 

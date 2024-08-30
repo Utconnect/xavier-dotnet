@@ -16,5 +16,12 @@ namespace Utconnect.Teacher.Services.Abstract
         /// <param name="id">The ID of teacher to get</param>
         /// <returns>A <see cref="Task"/> of <see cref="Result{T}"/> representing the asynchronous operation, with a <see cref="Result{T}"/> containing the teacher data.</returns>
         Task<Result<TeacherResponse>> GetById(Guid id);
+
+        /// <summary>
+        /// Get teacher data by UserID.
+        /// </summary>
+        /// <param name="userId">The UserID of teacher to get</param>
+        /// <returns>A <see cref="Task"/> of <see cref="Result{T}"/> representing the asynchronous operation, with a <see cref="Result{T}"/> containing the teacher data.</returns>
+        Task<Result<TeacherResponse>> GetByUserId(Guid userId);
     }
 }
